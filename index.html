@@ -343,7 +343,7 @@
     <button onclick="showForm('vehicle')" id="vehicleBtn" class="active">
         Vehicle Inspection
     </button>
-    <button onclick="showForm('flha')" id="flhaBtn" class="">
+    <button onclick="showForm('flha')" id="flhaBtn">
         Field Level Hazard Assessment
     </button>
 </div>
@@ -723,6 +723,8 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
+showForm('vehicle'); // force Vehicle Inspection as default
+
             // Populate Vehicle table (one time)
             const tbody = document.getElementById('inspectionTableBody');
             if (tbody) {
