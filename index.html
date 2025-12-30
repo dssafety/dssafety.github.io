@@ -1,0 +1,755 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safety Forms</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        .form-selector { text-align: center; margin-bottom: 30px; }
+        .form-selector button {
+            background: white;
+            border: none;
+            padding: 15px 30px;
+            margin: 0 10px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .form-selector button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        .form-selector button.active { background: #4CAF50; color: white; }
+
+        .form-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            display: none;
+        }
+        .form-container.active { display: block; animation: fadeIn 0.5s; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 28px;
+        }
+
+        .section {
+            margin-bottom: 25px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f9f9f9;
+        }
+
+        .section-title {
+            font-weight: bold;
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .task-description {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-bottom: 15px;
+            min-height: 80px;
+        }
+
+        .three-columns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .column-header {
+            font-weight: bold;
+            color: #555;
+            font-size: 13px;
+            font-style: italic;
+            padding: 5px;
+            background: #e8eaf6;
+            border-radius: 4px;
+        }
+
+        .hazard-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .hazard-column {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .checkbox-item {
+            margin: 8px 0;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            margin-right: 8px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+.checkbox-item input[type="checkbox"] {
+    margin-right: 8px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+
+    /* Force consistent sizing across browsers */
+    -webkit-appearance: none;
+    appearance: none;
+
+    border: 2px solid #888;
+    border-radius: 3px;
+    background: #fff;
+
+    /* keeps it aligned nicely with wrapped labels */
+    flex: 0 0 18px;
+}
+
+.checkbox-item input[type="checkbox"]:checked {
+    background: #4CAF50;
+    border-color: #4CAF50;
+    position: relative;
+}
+
+.checkbox-item input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 1px;
+    width: 4px;
+    height: 9px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+        .checkbox-item label {
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .input-group { display: flex; flex-direction: column; }
+        .input-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 14px;
+        }
+        .input-group input,
+        .input-group textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .submit-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            display: block;
+            margin: 30px auto 0;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .submit-btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .vehicle-header {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .inspection-table { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: white;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+
+        td:first-child {
+            text-align: left;
+            font-weight: 500;
+            background: #f5f5f5;
+            min-width: 120px;
+        }
+
+        /* Freeze first column (Inspection Items) */
+        .inspection-table th:first-child,
+        .inspection-table td:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 3;
+            background: #f5f5f5;
+        }
+
+        /* Ensure header cell stays above body cells */
+        .inspection-table thead th:first-child {
+            z-index: 4;
+            background: #667eea;
+            color: white;
+        }
+
+        td input[type="checkbox"] { cursor: pointer; width: 16px; height: 16px; }
+
+        .status-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        /* =========================
+           FIX: Bio + Psychosocial formatting
+           - side-by-side
+           - title not inside white box
+           - only options area is white
+           ========================= */
+        .hazard-grid.two-col {
+            grid-template-columns: repeat(2, 1fr);
+            align-items: start;
+        }
+
+        .hazard-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            overflow: hidden;
+            background: transparent;
+        }
+
+        .hazard-card-title {
+            font-weight: bold;
+            font-size: 18px;
+            color: #333;
+            padding: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .hazard-card-body {
+            background: white;
+            padding: 15px;
+        }
+
+        /* =========================
+           Mobile Optimizations
+           ========================= */
+
+        /* Tablets & Phones */
+        @media (max-width: 900px) {
+            body { padding: 10px; }
+            .container { max-width: 100%; }
+            h1 { font-size: 22px; }
+
+            .form-selector button { width: 100%; margin: 8px 0; }
+
+            .three-columns,
+            .hazard-grid,
+            .vehicle-header,
+            .input-row { grid-template-columns: 1fr; }
+
+            .section { padding: 15px; }
+        }
+
+        /* Phones */
+        @media (max-width: 600px) {
+            th, td { font-size: 14px; padding: 10px; }
+            td:first-child { min-width: auto; }
+
+            input[type="text"],
+            textarea { font-size: 16px; } /* prevents iOS zoom-on-focus */
+
+            .submit-btn { width: 100%; }
+
+            .inspection-table {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+       <div class="form-selector">
+    <button onclick="showForm('vehicle')" id="vehicleBtn" class="">
+        Vehicle Inspection
+    </button>
+    <button onclick="showForm('flha')" id="flhaBtn" class="active">
+        Field Level Hazard Assessment
+    </button>
+</div>
+
+
+        <!-- FLHA Form -->
+        <div id="flhaForm" class="form-container active">
+            <h1>Field Level Hazard Assessment (FLHA)</h1>
+
+            <form action="https://engine.rewst.io/webhooks/custom/trigger/019aeb48-09e0-707e-8cea-af827c4eaa65/f351c554-9f0a-4490-b615-3d7f26c999d7" method="POST">
+                <input type="hidden" name="formType" value="FLHA">
+
+                <!-- Consolidated hazard fields so multiple checkbox selections survive webhook parsing -->
+                <input type="hidden" name="hazard_physical_all" id="hazard_physical_all" value="">
+                <input type="hidden" name="hazard_ergonomic_all" id="hazard_ergonomic_all" value="">
+                <input type="hidden" name="hazard_chemical_all" id="hazard_chemical_all" value="">
+                <input type="hidden" name="hazard_biological_all" id="hazard_biological_all" value="">
+                <input type="hidden" name="hazard_psychosocial_all" id="hazard_psychosocial_all" value="">
+
+                <div class="section">
+                    <div class="input-group" style="margin-bottom: 15px;">
+                        <label>Name:</label>
+                        <input type="text" name="name">
+                    </div>
+                    <div class="input-group" style="margin-bottom: 15px;">
+                        <label>Attendees:</label>
+                        <textarea name="attendees" style="min-height: 80px;"></textarea>
+                    </div>
+                    <div class="input-group" style="margin-bottom: 15px;">
+                        <label>Client Name:</label>
+                        <input type="text" name="clientName">
+                    </div>
+                    <div class="input-group" style="margin-bottom: 15px;">
+                        <label>Job Number:</label>
+                        <input type="text" name="jobNumber">
+                    </div>
+                    <div class="input-group" style="margin-bottom: 15px;">
+                        <label>Rig Number:</label>
+                        <input type="text" name="rigNumber">
+                    </div>
+                    <div class="input-group" style="margin-bottom: 15px;">
+                        <label>Location:</label>
+                        <input type="text" name="location">
+                    </div>
+                </div>
+
+                <div class="section">
+                    <textarea name="taskDescription" class="task-description" placeholder="Describe the task(s) being performed"></textarea>
+
+                    <div class="three-columns">
+                        <div>
+                            <div class="column-header">See It</div>
+                            <div style="margin-top: 10px; font-style: italic; color: #666;">What could go wrong?</div>
+                        </div>
+                        <div>
+                            <div class="column-header">Evaluate It</div>
+                            <div style="margin-top: 10px; font-style: italic; color: #666;">How bad could it be?</div>
+                        </div>
+                        <div>
+                            <div class="column-header">Control It</div>
+                            <div style="margin-top: 10px; font-style: italic; color: #666;">What can I do to fix it?</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Hazards to Consider - check off all that apply</div>
+
+                    <div style="margin-bottom: 20px;">
+                        <div class="section-title" style="background: #e3f2fd; padding: 10px; border-radius: 4px;">Physical</div>
+                        <div class="hazard-grid">
+                            <div class="hazard-column">
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_physical" value="Housekeeping" id="p1"><label for="p1">Housekeeping</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_physical" value="Material storage &amp; handling" id="p2"><label for="p2">Material storage &amp; handling</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_physical" value="Slip/Trip/Fall potential" id="p3"><label for="p3">Slip/Trip/Fall potential</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_physical" value="Blocked exits &amp; walkways" id="p4"><label for="p4">Blocked exits &amp; walkways</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_physical" value="Confined/restricted space" id="p5"><label for="p5">Confined/restricted space</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_physical" value="Improper ventilation" id="p6"><label for="p6">Improper ventilation</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_physical" value="Powerlines overhead/underground" id="p7"><label for="p7">Powerlines overhead/underground</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_physical" value="Ground/surface condition" id="p8"><label for="p8">Ground/surface condition</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_physical" value="Open Excavation" id="p9"><label for="p9">Open Excavation</label></div>
+                            </div>
+                            <div class="hazard-column">
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_physical" value="Lighting" id="p10"><label for="p10">Lighting</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_physical" value="Weather" id="p11"><label for="p11">Weather</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_physical" value="Hot work" id="p12"><label for="p12">Hot work</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_physical" value="Vehicle/pedestrian traffic" id="p13"><label for="p13">Vehicle/pedestrian traffic</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_physical" value="Working at heights" id="p14"><label for="p14">Working at heights</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_physical" value="Scaffolding" id="p15"><label for="p15">Scaffolding</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_physical" value="Falling objects" id="p16"><label for="p16">Falling objects</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_physical" value="Loads moving or being hoisted" id="p17"><label for="p17">Loads moving or being hoisted</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_physical" value="Ladder use" id="p18"><label for="p18">Ladder use</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_physical" value="Critical Lift" id="p19"><label for="p19">Critical Lift</label></div>
+                            </div>
+                            <div class="hazard-column">
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_physical" value="Others working below/overhead" id="p20"><label for="p20">Others working below/overhead</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_physical" value="Incorrect tools/equipment" id="p21"><label for="p21">Incorrect tools/equipment</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_physical" value="Working on/near energized equipment" id="p22"><label for="p22">Working on/near energized equipment</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_physical" value="Defective tools/equipment" id="p23"><label for="p23">Defective tools/equipment</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_physical" value="Unguarded equipment" id="p24"><label for="p24">Unguarded equipment</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_physical" value="Noise" id="p25"><label for="p25">Noise</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_physical" value="Vibration" id="p26"><label for="p26">Vibration</label></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <div class="section-title" style="background: #fff3e0; padding: 10px; border-radius: 4px;">Ergonomic</div>
+                        <div class="hazard-grid">
+                            <div class="hazard-column">
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_ergonomic" value="Awkward body positioning" id="e1"><label for="e1">Awkward body positioning</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_ergonomic" value="Overexertion" id="e2"><label for="e2">Overexertion</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_ergonomic" value="Repetitive Motion" id="e3"><label for="e3">Repetitive Motion</label></div>
+                            </div>
+                            <div class="hazard-column">
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_ergonomic" value="Twisting/reaching/bending" id="e4"><label for="e4">Twisting/reaching/bending</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_ergonomic" value="Cramped/tight work area" id="e5"><label for="e5">Cramped/tight work area</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_ergonomic" value="Forceful pushing/pulling" id="e6"><label for="e6">Forceful pushing/pulling</label></div>
+                            </div>
+                            <div class="hazard-column">
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_ergonomic" value="Awkward grip/load carried" id="e7"><label for="e7">Awkward grip/load carried</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_ergonomic" value="Working at over head height" id="e8"><label for="e8">Working at over head height</label></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <div class="section-title" style="background: #ffebee; padding: 10px; border-radius: 4px;">Chemical</div>
+                        <div class="hazard-grid">
+                            <div class="hazard-column">
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_chemical" value="Freeze burn" id="c1"><label for="c1">Freeze burn</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_chemical" value="Chemical handling/storage" id="c2"><label for="c2">Chemical handling/storage</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_chemical" value="Spill potential" id="c3"><label for="c3">Spill potential</label></div>
+                            </div>
+                            <div class="hazard-column">
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_chemical" value="Dust/fumes/vapours/gases" id="c4"><label for="c4">Dust/fumes/vapours/gases</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_chemical" value="Fire/explosion/reactive properties" id="c5"><label for="c5">Fire/explosion/reactive properties</label></div>
+                            </div>
+                            <div class="hazard-column">
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_chemical" value="Acid/corrosive material" id="c6"><label for="c6">Acid/corrosive material</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="hazard_chemical" value="Aerosols" id="c7"><label for="c7">Aerosols</label></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FIXED: Biological + Psychosocial (side-by-side, title not inside white body) -->
+                    <div style="margin-bottom: 20px;">
+                        
+
+                            <!-- Biological -->
+                           <div style="margin-bottom: 20px;">
+    <div class="section-title" style="background: #e8f5e9; padding: 10px; border-radius: 4px;">
+        Biological
+    </div>
+
+    <div class="hazard-grid">
+        <div class="hazard-column">
+            <div class="checkbox-item"><input type="checkbox" name="hazard_biological" value="Waste disposal" id="b1"><label for="b1">Waste disposal</label></div>
+            <div class="checkbox-item"><input type="checkbox" name="hazard_biological" value="Blood/bodily fluid" id="b2"><label for="b2">Blood/bodily fluid</label></div>
+            <div class="checkbox-item"><input type="checkbox" name="hazard_biological" value="Virus/bacteria" id="b3"><label for="b3">Virus/bacteria</label></div>
+            <div class="checkbox-item"><input type="checkbox" name="hazard_biological" value="Insect bite" id="b4"><label for="b4">Insect bite</label></div>
+            <div class="checkbox-item"><input type="checkbox" name="hazard_biological" value="Lack of hygiene/sanitation" id="b5"><label for="b5">Lack of hygiene/sanitation</label></div>
+        </div>
+    </div>
+</div>
+
+
+                            <!-- Psychosocial -->
+                            <div style="margin-bottom: 20px;">
+    <div class="section-title" style="background: #f3e5f5; padding: 10px; border-radius: 4px;">
+        Psychosocial
+    </div>
+
+    <div class="hazard-grid">
+        <div class="hazard-column">
+            <div class="checkbox-item"><input type="checkbox" name="hazard_psychosocial" value="Personal limitations/illness, age, mental stability" id="ps1"><label for="ps1">Personal limitations/illness, age, mental stability</label></div>
+            <div class="checkbox-item"><input type="checkbox" name="hazard_psychosocial" value="Harassment/violence" id="ps2"><label for="ps2">Harassment/violence</label></div>
+            <div class="checkbox-item"><input type="checkbox" name="hazard_psychosocial" value="Stress/fatigue" id="ps3"><label for="ps3">Stress/fatigue</label></div>
+            <div class="checkbox-item"><input type="checkbox" name="hazard_psychosocial" value="Working alone" id="ps4"><label for="ps4">Working alone</label></div>
+            <div class="checkbox-item"><input type="checkbox" name="hazard_psychosocial" value="Worker(s) not competent" id="ps5"><label for="ps5">Worker(s) not competent</label></div>
+        </div>
+    </div>
+</div>
+
+                            
+
+                        
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>List PPE Required:</label>
+                            <input type="text" name="ppeRequired">
+                        </div>
+                        <div class="input-group">
+                            <label>PPE Inspected?</label>
+                            <div class="status-group">
+                                <input type="radio" name="ppeInspected" value="Yes" id="ppeYes"><label for="ppeYes">Yes</label>
+                                <input type="radio" name="ppeInspected" value="No" id="ppeNo"><label for="ppeNo">No</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-row" style="margin-top: 15px;">
+                        <div class="input-group">
+                            <label>Location of First Aid supplies:</label>
+                            <input type="text" name="firstAidLocation">
+                        </div>
+                        <div class="input-group">
+                            <label>Emergency Muster Location:</label>
+                            <input type="text" name="musterLocation">
+                        </div>
+                    </div>
+
+                    <div class="input-group" style="margin-top: 15px;">
+                        <label>If working alone, explain check-in procedure:</label>
+                        <textarea name="checkInProcedure" style="min-height: 60px;"></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">Submit FLHA</button>
+            </form>
+        </div>
+
+        <!-- Vehicle Inspection Form -->
+        <div id="vehicleForm" class="form-container">
+            <h1>Vehicle Inspection</h1>
+
+            <form action="https://engine.rewst.io/webhooks/custom/trigger/019aeb48-09e0-707e-8cea-af827c4eaa65/f351c554-9f0a-4490-b615-3d7f26c999d7" method="POST">
+                <input type="hidden" name="formType" value="Vehicle Inspection">
+
+                <div class="section">
+                    <div class="input-group" style="margin-bottom: 15px;">
+                        <label>Job Number:</label>
+                        <input type="text" name="jobNumber">
+                    </div>
+                    <div class="input-group" style="margin-bottom: 15px;">
+                        <label>Rig Number:</label>
+                        <input type="text" name="rigNumber">
+                    </div>
+                    <div class="input-group" style="margin-bottom: 15px;">
+                        <label>Site:</label>
+                        <input type="text" name="site">
+                    </div>
+
+                    <div class="vehicle-header">
+                        <div class="input-group">
+                            <label>Month:</label>
+                            <input type="text" name="month">
+                        </div>
+                        <div class="input-group">
+                            <label>Year:</label>
+                            <input type="text" name="year">
+                        </div>
+                        <div class="input-group">
+                            <label>Vehicle #:</label>
+                            <input type="text" name="vehicleNumber">
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Conducted By:</label>
+                            <input type="text" name="conductedBy">
+                        </div>
+                        <div class="input-group">
+                            <label>Signature:</label>
+                            <input type="text" name="signature">
+                        </div>
+                    </div>
+
+                    <!-- Vehicle complianceStatus: matches your email template -->
+                    <div class="status-group" style="margin-top: 15px;">
+                        <label style="margin-right: 15px;">
+                            <input type="radio" name="complianceStatus" value="compliant">
+                            Compliant ✓
+                        </label>
+                        <label style="margin-right: 15px;">
+                            <input type="radio" name="complianceStatus" value="nonCompliant">
+                            Non Compliant ✗
+                        </label>
+                        <label style="font-style: italic; color: #666;">
+                            <input type="radio" name="complianceStatus" value="" checked="">
+                            Not In Use
+                        </label>
+                    </div>
+
+                    <!-- DAILY VEHICLE CHECKLIST TABLE (one checkbox per item) -->
+                    <div class="inspection-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Inspection Item</th>
+                                    <th>
+                                        <label style="display:flex; align-items:center; justify-content:center; gap:6px; font-weight:bold;">
+                                            <input type="checkbox" id="selectAllVehicleItems">
+                                            Select All
+                                        </label>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <!-- IMPORTANT: leave empty; JS generates rows to avoid duplicates -->
+                            <tbody id="inspectionTableBody"><tr><td>Backup Alarm</td><td><input type="checkbox" name="inspection_BackupAlarm" value="checked"></td></tr><tr><td>Backup Lights</td><td><input type="checkbox" name="inspection_BackupLights" value="checked"></td></tr><tr><td>Body</td><td><input type="checkbox" name="inspection_Body" value="checked"></td></tr><tr><td>Brakes</td><td><input type="checkbox" name="inspection_Brakes" value="checked"></td></tr><tr><td>Doors</td><td><input type="checkbox" name="inspection_Doors" value="checked"></td></tr><tr><td>Fire Extinguisher</td><td><input type="checkbox" name="inspection_FireExtinguisher" value="checked"></td></tr><tr><td>First Aid Kit</td><td><input type="checkbox" name="inspection_FirstAidKit" value="checked"></td></tr><tr><td>Fuel</td><td><input type="checkbox" name="inspection_Fuel" value="checked"></td></tr><tr><td>Gauges</td><td><input type="checkbox" name="inspection_Gauges" value="checked"></td></tr><tr><td>Glass</td><td><input type="checkbox" name="inspection_Glass" value="checked"></td></tr><tr><td>Heater/Defroster</td><td><input type="checkbox" name="inspection_HeaterDefroster" value="checked"></td></tr><tr><td>Horn</td><td><input type="checkbox" name="inspection_Horn" value="checked"></td></tr><tr><td>Lights / Beacon</td><td><input type="checkbox" name="inspection_LightsBeacon" value="checked"></td></tr><tr><td>Oil level</td><td><input type="checkbox" name="inspection_Oillevel" value="checked"></td></tr><tr><td>Seat belts</td><td><input type="checkbox" name="inspection_Seatbelts" value="checked"></td></tr><tr><td>Spill Kit</td><td><input type="checkbox" name="inspection_SpillKit" value="checked"></td></tr><tr><td>Steering</td><td><input type="checkbox" name="inspection_Steering" value="checked"></td></tr><tr><td>Tires</td><td><input type="checkbox" name="inspection_Tires" value="checked"></td></tr><tr><td>Turn Signals</td><td><input type="checkbox" name="inspection_TurnSignals" value="checked"></td></tr><tr><td>Wheel Chocks</td><td><input type="checkbox" name="inspection_WheelChocks" value="checked"></td></tr><tr><td>Wipers</td><td><input type="checkbox" name="inspection_Wipers" value="checked"></td></tr></tbody>
+                        </table>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Submit Vehicle Inspection</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="hudu-eh-root"></div>
+        <div id="hudu-ch-root"></div>
+        <div id="hudu-pc-root"></div>
+    </div>
+
+    <script>
+        function showForm(formType) {
+            document.getElementById('flhaForm').classList.remove('active');
+            document.getElementById('vehicleForm').classList.remove('active');
+            document.getElementById('flhaBtn').classList.remove('active');
+            document.getElementById('vehicleBtn').classList.remove('active');
+
+            if (formType === 'flha') {
+                document.getElementById('flhaForm').classList.add('active');
+                document.getElementById('flhaBtn').classList.add('active');
+            } else {
+                document.getElementById('vehicleForm').classList.add('active');
+                document.getElementById('vehicleBtn').classList.add('active');
+            }
+        }
+
+        // Generate vehicle inspection table rows (daily form: one checkbox per item)
+        function generateCheckboxRow(itemName) {
+            const safeName = itemName
+                .replace(/\s+/g, '')
+                .replace(/\//g, '')
+                .replace(/[^a-zA-Z0-9_\-]/g, '');
+            const fieldName = 'inspection_' + safeName;
+
+            return '<tr><td>' + itemName + '</td>' +
+                   '<td><input type="checkbox" name="' + fieldName + '" value="checked"></td></tr>';
+        }
+
+        const inspectionItems = [
+            "Backup Alarm", "Backup Lights", "Body", "Brakes", "Doors",
+            "Fire Extinguisher", "First Aid Kit", "Fuel", "Gauges", "Glass",
+            "Heater/Defroster", "Horn", "Lights / Beacon", "Oil level", "Seat belts",
+            "Spill Kit", "Steering", "Tires", "Turn Signals", "Wheel Chocks", "Wipers"
+        ];
+
+        // =========================
+        // FLHA: consolidate hazard checkbox selections into *_all fields (delimiter "||")
+        // =========================
+        function joinCheckedValues(fieldName) {
+            return Array.from(document.querySelectorAll('input[name="' + fieldName + '"]:checked'))
+                .map(cb => cb.value)
+                .join('||');
+        }
+
+        function hydrateFlhaHazardAllFields(formEl) {
+            const formTypeEl = formEl.querySelector('input[name="formType"]');
+            if (!formTypeEl || formTypeEl.value !== 'FLHA') return;
+
+            const setVal = (id, value) => {
+                const el = formEl.querySelector('#' + id);
+                if (el) el.value = value || '';
+            };
+
+            setVal('hazard_physical_all', joinCheckedValues('hazard_physical'));
+            setVal('hazard_ergonomic_all', joinCheckedValues('hazard_ergonomic'));
+            setVal('hazard_chemical_all', joinCheckedValues('hazard_chemical'));
+            setVal('hazard_biological_all', joinCheckedValues('hazard_biological'));
+            setVal('hazard_psychosocial_all', joinCheckedValues('hazard_psychosocial'));
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Populate Vehicle table (one time)
+            const tbody = document.getElementById('inspectionTableBody');
+            if (tbody) {
+                tbody.innerHTML = '';
+                inspectionItems.forEach(item => {
+                    tbody.innerHTML += generateCheckboxRow(item);
+                });
+            }
+
+            // Bind FLHA consolidation on submit
+            document.querySelectorAll('form').forEach(formEl => {
+                formEl.addEventListener('submit', function () {
+                    hydrateFlhaHazardAllFields(formEl);
+                });
+            });
+
+            // Vehicle Inspection: Select All toggle (daily checklist)
+            const selectAll = document.getElementById('selectAllVehicleItems');
+            if (selectAll) {
+                selectAll.addEventListener('change', function () {
+                    document
+                        .querySelectorAll('#inspectionTableBody input[type="checkbox"]')
+                        .forEach(cb => cb.checked = this.checked);
+                });
+            }
+        });
+    </script>
+
+
+</body></html>z
