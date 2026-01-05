@@ -582,10 +582,7 @@
                         <label>Job Number:</label>
                         <input type="text" name="jobNumber">
                     </div>
-                    <div class="input-group" style="margin-bottom: 15px;">
-                        <label>Rig Number:</label>
-                        <input type="text" name="rigNumber">
-                    </div>
+                  
                     <div class="input-group" style="margin-bottom: 15px;">
                         <label>Site:</label>
                         <input type="text" name="site">
@@ -596,17 +593,53 @@
                     </div>
                     <div class="vehicle-header">
                         <div class="input-group">
-                            <label>Month:</label>
-                            <input type="text" name="month">
-                        </div>
-                        <div class="input-group">
-                            <label>Day:</label>
-                            <input type="text" name="day">
-                        </div>
-                        <div class="input-group">
-                            <label>Year:</label>
-                            <input type="text" name="year">
-                        </div>
+  <label>Month</label>
+  <input
+    type="text"
+    name="month"
+    id="month"
+    required
+    inputmode="numeric"
+    autocomplete="off"
+    maxlength="2"
+    placeholder="MM"
+    pattern="^(0[1-9]|1[0-2])$"
+    title="Enter a 2-digit month (01–12)"
+  />
+</div>
+
+<div class="input-group">
+  <label>Day</label>
+  <input
+    type="text"
+    name="day"
+    id="day"
+    required
+    inputmode="numeric"
+    autocomplete="off"
+    maxlength="2"
+    placeholder="DD"
+    pattern="^(0[1-9]|[12][0-9]|3[01])$"
+    title="Enter a 2-digit day (01–31)"
+  />
+</div>
+
+<div class="input-group">
+  <label>Year</label>
+  <input
+    type="text"
+    name="year"
+    id="year"
+    required
+    inputmode="numeric"
+    autocomplete="off"
+    maxlength="4"
+    placeholder="YYYY"
+    pattern="^(19|20)\d{2}$"
+    title="Enter a 4-digit year (e.g., 2026)"
+  />
+</div>
+
                     </div>
                      <div class="vehicle-header">
                      
