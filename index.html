@@ -343,7 +343,7 @@
     <button onclick="showForm('vehicle')" id="vehicleBtn" class="active">
         Vehicle Inspection
     </button>
-    <button onclick="showForm('flha')" id="flhaBtn">
+    <button onclick="showForm('flha')" id="flhaBtn" class="">
         Field Level Hazard Assessment
     </button>
 </div>
@@ -571,7 +571,7 @@
         </div>
 
         <!-- Vehicle Inspection Form -->
-        <div id="vehicleForm" class="form-container">
+        <div id="vehicleForm" class="form-container active">
             <h1>Vehicle Inspection</h1>
 
             <form action="https://engine.rewst.io/webhooks/custom/trigger/019aeb48-09e0-707e-8cea-af827c4eaa65/f351c554-9f0a-4490-b615-3d7f26c999d7" method="POST">
@@ -590,20 +590,26 @@
                         <label>Site:</label>
                         <input type="text" name="site">
                     </div>
-
+ <div class="input-group" style="margin-bottom: 15px;">
+                        <label>Vehicle #:</label>
+                        <input type="text" name="vehicleNumber">
+                    </div>
                     <div class="vehicle-header">
                         <div class="input-group">
                             <label>Month:</label>
                             <input type="text" name="month">
                         </div>
                         <div class="input-group">
+                            <label>Day:</label>
+                            <input type="text" name="day">
+                        </div>
+                        <div class="input-group">
                             <label>Year:</label>
                             <input type="text" name="year">
                         </div>
-                        <div class="input-group">
-                            <label>Vehicle #:</label>
-                            <input type="text" name="vehicleNumber">
-                        </div>
+                    </div>
+                     <div class="vehicle-header">
+                     
                     </div>
 
                     <div class="input-row">
@@ -754,4 +760,4 @@ showForm('vehicle'); // force Vehicle Inspection as default
     </script>
 
 
-z</body></html>
+</body></html>
