@@ -260,7 +260,34 @@
             color: white;
         }
 
-        td input[type="checkbox"] { cursor: pointer; width: 16px; height: 16px; }
+        td input[type="checkbox"],
+        td input[type="radio"] { cursor: pointer; width: 16px; height: 16px; }
+
+        .mark-all-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .mark-all-label {
+            font-weight: bold;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .mark-all-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .mark-all-btn:hover { background: #5568d3; }
 
         .status-group {
             display: flex;
@@ -656,38 +683,28 @@
                         </div>
                     </div>
 
-                    <!-- Vehicle complianceStatus: matches your email template -->
-                    <div class="status-group" style="margin-top: 15px;">
-                        <label style="margin-right: 15px;">
-                            <input type="radio" name="complianceStatus" value="compliant" checked="">
-                            Compliant ✓
-                        </label>
-                        <label style="margin-right: 15px;">
-                            <input type="radio" name="complianceStatus" value="needsRepair">
-                            Needs Repair ✗
-                        </label>
-                        <label style="margin-right: 15px;">
-                            <input type="radio" name="complianceStatus" value="Nonoperational">
-                            Nonoperational ✗
-                        </label>
-                    </div>
+                    <!-- Overall complianceStatus is now derived from per-item selections on submit (worst status wins) -->
+                    <input type="hidden" name="complianceStatus" id="complianceStatusHidden" value="compliant">
 
-                    <!-- DAILY VEHICLE CHECKLIST TABLE (one checkbox per item) -->
+                    <!-- DAILY VEHICLE CHECKLIST TABLE (per-item status radios) -->
+                    <div class="mark-all-group">
+                        <span class="mark-all-label">Mark all:</span>
+                        <button type="button" class="mark-all-btn" data-status="compliant">Compliant ✓</button>
+                        <button type="button" class="mark-all-btn" data-status="needsRepair">Needs Repair ✗</button>
+                        <button type="button" class="mark-all-btn" data-status="nonoperational">Nonoperational ✗</button>
+                    </div>
                     <div class="inspection-table">
                         <table>
                             <thead>
                                 <tr>
                                     <th>Inspection Item</th>
-                                    <th>
-                                        <label style="display:flex; align-items:center; justify-content:center; gap:6px; font-weight:bold;">
-                                            <input type="checkbox" id="selectAllVehicleItems">
-                                            Select All
-                                        </label>
-                                    </th>
+                                    <th>Compliant ✓</th>
+                                    <th>Needs Repair ✗</th>
+                                    <th>Nonoperational ✗</th>
                                 </tr>
                             </thead>
                             <!-- IMPORTANT: leave empty; JS generates rows to avoid duplicates -->
-                            <tbody id="inspectionTableBody"><tr><td>Backup Alarm</td><td><input type="checkbox" name="inspection_BackupAlarm" value="checked"></td></tr><tr><td>Backup Lights</td><td><input type="checkbox" name="inspection_BackupLights" value="checked"></td></tr><tr><td>Body</td><td><input type="checkbox" name="inspection_Body" value="checked"></td></tr><tr><td>Brakes</td><td><input type="checkbox" name="inspection_Brakes" value="checked"></td></tr><tr><td>Doors</td><td><input type="checkbox" name="inspection_Doors" value="checked"></td></tr><tr><td>Fire Extinguisher</td><td><input type="checkbox" name="inspection_FireExtinguisher" value="checked"></td></tr><tr><td>First Aid Kit</td><td><input type="checkbox" name="inspection_FirstAidKit" value="checked"></td></tr><tr><td>Fuel</td><td><input type="checkbox" name="inspection_Fuel" value="checked"></td></tr><tr><td>Gauges</td><td><input type="checkbox" name="inspection_Gauges" value="checked"></td></tr><tr><td>Glass</td><td><input type="checkbox" name="inspection_Glass" value="checked"></td></tr><tr><td>Heater/Defroster</td><td><input type="checkbox" name="inspection_HeaterDefroster" value="checked"></td></tr><tr><td>Horn</td><td><input type="checkbox" name="inspection_Horn" value="checked"></td></tr><tr><td>Lights / Beacon</td><td><input type="checkbox" name="inspection_LightsBeacon" value="checked"></td></tr><tr><td>Oil level</td><td><input type="checkbox" name="inspection_Oillevel" value="checked"></td></tr><tr><td>Seat belts</td><td><input type="checkbox" name="inspection_Seatbelts" value="checked"></td></tr><tr><td>Spill Kit</td><td><input type="checkbox" name="inspection_SpillKit" value="checked"></td></tr><tr><td>Steering</td><td><input type="checkbox" name="inspection_Steering" value="checked"></td></tr><tr><td>Tires</td><td><input type="checkbox" name="inspection_Tires" value="checked"></td></tr><tr><td>Turn Signals</td><td><input type="checkbox" name="inspection_TurnSignals" value="checked"></td></tr><tr><td>Wheel Chocks</td><td><input type="checkbox" name="inspection_WheelChocks" value="checked"></td></tr><tr><td>Wipers</td><td><input type="checkbox" name="inspection_Wipers" value="checked"></td></tr></tbody>
+                            <tbody id="inspectionTableBody"><tr><td>Backup Alarm</td><td><input type="radio" name="inspection_BackupAlarm" value="compliant" checked></td><td><input type="radio" name="inspection_BackupAlarm" value="needsRepair"></td><td><input type="radio" name="inspection_BackupAlarm" value="nonoperational"></td></tr><tr><td>Backup Lights</td><td><input type="radio" name="inspection_BackupLights" value="compliant" checked></td><td><input type="radio" name="inspection_BackupLights" value="needsRepair"></td><td><input type="radio" name="inspection_BackupLights" value="nonoperational"></td></tr><tr><td>Body</td><td><input type="radio" name="inspection_Body" value="compliant" checked></td><td><input type="radio" name="inspection_Body" value="needsRepair"></td><td><input type="radio" name="inspection_Body" value="nonoperational"></td></tr><tr><td>Brakes</td><td><input type="radio" name="inspection_Brakes" value="compliant" checked></td><td><input type="radio" name="inspection_Brakes" value="needsRepair"></td><td><input type="radio" name="inspection_Brakes" value="nonoperational"></td></tr><tr><td>Doors</td><td><input type="radio" name="inspection_Doors" value="compliant" checked></td><td><input type="radio" name="inspection_Doors" value="needsRepair"></td><td><input type="radio" name="inspection_Doors" value="nonoperational"></td></tr><tr><td>Fire Extinguisher</td><td><input type="radio" name="inspection_FireExtinguisher" value="compliant" checked></td><td><input type="radio" name="inspection_FireExtinguisher" value="needsRepair"></td><td><input type="radio" name="inspection_FireExtinguisher" value="nonoperational"></td></tr><tr><td>First Aid Kit</td><td><input type="radio" name="inspection_FirstAidKit" value="compliant" checked></td><td><input type="radio" name="inspection_FirstAidKit" value="needsRepair"></td><td><input type="radio" name="inspection_FirstAidKit" value="nonoperational"></td></tr><tr><td>Fuel</td><td><input type="radio" name="inspection_Fuel" value="compliant" checked></td><td><input type="radio" name="inspection_Fuel" value="needsRepair"></td><td><input type="radio" name="inspection_Fuel" value="nonoperational"></td></tr><tr><td>Gauges</td><td><input type="radio" name="inspection_Gauges" value="compliant" checked></td><td><input type="radio" name="inspection_Gauges" value="needsRepair"></td><td><input type="radio" name="inspection_Gauges" value="nonoperational"></td></tr><tr><td>Glass</td><td><input type="radio" name="inspection_Glass" value="compliant" checked></td><td><input type="radio" name="inspection_Glass" value="needsRepair"></td><td><input type="radio" name="inspection_Glass" value="nonoperational"></td></tr><tr><td>Heater/Defroster</td><td><input type="radio" name="inspection_HeaterDefroster" value="compliant" checked></td><td><input type="radio" name="inspection_HeaterDefroster" value="needsRepair"></td><td><input type="radio" name="inspection_HeaterDefroster" value="nonoperational"></td></tr><tr><td>Horn</td><td><input type="radio" name="inspection_Horn" value="compliant" checked></td><td><input type="radio" name="inspection_Horn" value="needsRepair"></td><td><input type="radio" name="inspection_Horn" value="nonoperational"></td></tr><tr><td>Lights / Beacon</td><td><input type="radio" name="inspection_LightsBeacon" value="compliant" checked></td><td><input type="radio" name="inspection_LightsBeacon" value="needsRepair"></td><td><input type="radio" name="inspection_LightsBeacon" value="nonoperational"></td></tr><tr><td>Oil level</td><td><input type="radio" name="inspection_Oillevel" value="compliant" checked></td><td><input type="radio" name="inspection_Oillevel" value="needsRepair"></td><td><input type="radio" name="inspection_Oillevel" value="nonoperational"></td></tr><tr><td>Seat belts</td><td><input type="radio" name="inspection_Seatbelts" value="compliant" checked></td><td><input type="radio" name="inspection_Seatbelts" value="needsRepair"></td><td><input type="radio" name="inspection_Seatbelts" value="nonoperational"></td></tr><tr><td>Spill Kit</td><td><input type="radio" name="inspection_SpillKit" value="compliant" checked></td><td><input type="radio" name="inspection_SpillKit" value="needsRepair"></td><td><input type="radio" name="inspection_SpillKit" value="nonoperational"></td></tr><tr><td>Steering</td><td><input type="radio" name="inspection_Steering" value="compliant" checked></td><td><input type="radio" name="inspection_Steering" value="needsRepair"></td><td><input type="radio" name="inspection_Steering" value="nonoperational"></td></tr><tr><td>Tires</td><td><input type="radio" name="inspection_Tires" value="compliant" checked></td><td><input type="radio" name="inspection_Tires" value="needsRepair"></td><td><input type="radio" name="inspection_Tires" value="nonoperational"></td></tr><tr><td>Turn Signals</td><td><input type="radio" name="inspection_TurnSignals" value="compliant" checked></td><td><input type="radio" name="inspection_TurnSignals" value="needsRepair"></td><td><input type="radio" name="inspection_TurnSignals" value="nonoperational"></td></tr><tr><td>Wheel Chocks</td><td><input type="radio" name="inspection_WheelChocks" value="compliant" checked></td><td><input type="radio" name="inspection_WheelChocks" value="needsRepair"></td><td><input type="radio" name="inspection_WheelChocks" value="nonoperational"></td></tr><tr><td>Wipers</td><td><input type="radio" name="inspection_Wipers" value="compliant" checked></td><td><input type="radio" name="inspection_Wipers" value="needsRepair"></td><td><input type="radio" name="inspection_Wipers" value="nonoperational"></td></tr></tbody>
                         </table>
                     </div>
 
@@ -717,8 +734,8 @@
             }
         }
 
-        // Generate vehicle inspection table rows (daily form: one checkbox per item)
-        function generateCheckboxRow(itemName) {
+        // Generate vehicle inspection table rows (per-item status radios)
+        function generateRadioRow(itemName) {
             const safeName = itemName
                 .replace(/\s+/g, '')
                 .replace(/\//g, '')
@@ -726,7 +743,26 @@
             const fieldName = 'inspection_' + safeName;
 
             return '<tr><td>' + itemName + '</td>' +
-                   '<td><input type="checkbox" name="' + fieldName + '" value="checked"></td></tr>';
+                   '<td><input type="radio" name="' + fieldName + '" value="compliant" checked></td>' +
+                   '<td><input type="radio" name="' + fieldName + '" value="needsRepair"></td>' +
+                   '<td><input type="radio" name="' + fieldName + '" value="nonoperational"></td></tr>';
+        }
+
+        // Derive overall complianceStatus from per-item selections (worst status wins)
+        function updateOverallComplianceStatus() {
+            const hidden = document.getElementById('complianceStatusHidden');
+            if (!hidden) return;
+            const selected = Array.from(
+                document.querySelectorAll('#inspectionTableBody input[type="radio"]:checked')
+            ).map(r => r.value);
+
+            if (selected.includes('nonoperational')) {
+                hidden.value = 'nonoperational';
+            } else if (selected.includes('needsRepair')) {
+                hidden.value = 'needsRepair';
+            } else {
+                hidden.value = 'compliant';
+            }
         }
 
         const inspectionItems = [
@@ -769,28 +805,32 @@ showForm('vehicle'); // force Vehicle Inspection as default
             if (tbody) {
                 tbody.innerHTML = '';
                 inspectionItems.forEach(item => {
-                    tbody.innerHTML += generateCheckboxRow(item);
+                    tbody.innerHTML += generateRadioRow(item);
                 });
             }
 
-            // Bind FLHA consolidation on submit
+            // Bind FLHA consolidation + Vehicle overall status on submit
             document.querySelectorAll('form').forEach(formEl => {
                 formEl.addEventListener('submit', function () {
                     hydrateFlhaHazardAllFields(formEl);
+                    updateOverallComplianceStatus();
                 });
             });
 
-            // Vehicle Inspection: Select All toggle (daily checklist)
-            const selectAll = document.getElementById('selectAllVehicleItems');
-            if (selectAll) {
-                selectAll.addEventListener('change', function () {
+            // Vehicle Inspection: Mark all rows with a given status
+            document.querySelectorAll('.mark-all-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const status = this.dataset.status;
                     document
-                        .querySelectorAll('#inspectionTableBody input[type="checkbox"]')
-                        .forEach(cb => cb.checked = this.checked);
+                        .querySelectorAll('#inspectionTableBody input[type="radio"][value="' + status + '"]')
+                        .forEach(r => r.checked = true);
                 });
-            }
+            });
         });
     </script>
+
+
+</body></html>
 
 
 </body></html>
