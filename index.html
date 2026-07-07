@@ -373,6 +373,9 @@
     <button onclick="showForm('flha')" id="flhaBtn" class="">
         Field Level Hazard Assessment
     </button>
+    <button onclick="showHotWorkForm()" id="hotworkBtn" class="">
+        Hot Work Permit
+    </button>
 </div>
 
 
@@ -713,6 +716,100 @@
             </form>
         </div>
 
+        <!-- ============================================================ -->
+        <!-- Hot Work Permit Form (ADDITIVE — do not modify FLHA/Vehicle) -->
+        <!-- All IDs prefixed hw_ to avoid collisions with other forms.   -->
+        <!-- ============================================================ -->
+        <div id="hotworkForm" class="form-container">
+            <h1>Hot Work Permit ** Under Construction **</h1>
+            <div class="hw-subtitle">For Cutting or Welding</div>
+
+            <form id="hw_form">
+                <input type="hidden" name="formType" value="HotWorkPermit">
+
+                <div class="section">
+                    <div class="section-title">Job Information</div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="hw_companyName">Company Name:</label>
+                            <input type="text" name="companyName" id="hw_companyName" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="hw_permitDate">Date:</label>
+                            <input type="date" name="permitDate" id="hw_permitDate" required>
+                        </div>
+                    </div>
+                    <div class="input-row" style="margin-top: 15px;">
+                        <div class="input-group">
+                            <label for="hw_workLocation">Work Location:</label>
+                            <input type="text" name="workLocation" id="hw_workLocation" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="hw_typeOfWork">Type of Work:</label>
+                            <input type="text" name="typeOfWork" id="hw_typeOfWork" required>
+                        </div>
+                    </div>
+                    <div class="input-row" style="margin-top: 15px;">
+                        <div class="input-group">
+                            <label for="hw_startTime">Start Time:</label>
+                            <input type="time" name="startTime" id="hw_startTime" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="hw_finishTime">Finish Time:</label>
+                            <input type="time" name="finishTime" id="hw_finishTime" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Checklist for Hot Work</div>
+
+                    <div class="mark-all-group">
+                        <span class="mark-all-label">Mark all:</span>
+                        <button type="button" class="mark-all-btn hw-mark-all" data-status="yes">Yes ✓</button>
+                        <button type="button" class="mark-all-btn hw-mark-all" data-status="no">No ✗</button>
+                    </div>
+
+                    <!-- NOTE: intentionally NOT using .inspection-table class (sticky column CSS is scoped to it) -->
+                    <div class="hw-checklist-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Checklist Item</th>
+                                    <th style="width:70px;">Yes</th>
+                                    <th style="width:70px;">No</th>
+                                </tr>
+                            </thead>
+                            <!-- IMPORTANT: leave empty; JS generates rows to avoid duplicates -->
+                            <tbody id="hw_checklistTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Authorization</div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="hw_authorizedSignature">Authorized Signature (type full name):</label>
+                            <input type="text" name="authorizedSignature" id="hw_authorizedSignature" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="hw_signatureDate">Date:</label>
+                            <input type="date" name="signatureDate" id="hw_signatureDate" required>
+                        </div>
+                    </div>
+                    <div class="hw-footnote">
+                        For specific requirements, refer to General Industry Standards 1910.146, 1910.252,
+                        1910.253, 1910.254, 1910.272, and Construction Standards 1926.803, 1926.350,
+                        1926.352, 1926.343.
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="hw_submitBtn">Submit Hot Work Permit</button>
+                <div class="hw-status-message" id="hw_statusMessage"></div>
+            </form>
+        </div>
+
         <div id="hudu-eh-root"></div>
         <div id="hudu-ch-root"></div>
         <div id="hudu-pc-root"></div>
@@ -830,7 +927,172 @@ showForm('vehicle'); // force Vehicle Inspection as default
     </script>
 
 
-</body></html>
+<!-- ================================================================ -->
+<!-- HOT WORK PERMIT — additive styles + logic. No existing code above -->
+<!-- this comment has been modified. Safe to remove this block to      -->
+<!-- fully roll back the Hot Work Permit feature.                      -->
+<!-- ================================================================ -->
+<style>
+    .hw-subtitle {
+        text-align: center;
+        color: #666;
+        font-size: 14px;
+        margin: -20px 0 30px;
+    }
+    .hw-checklist-table { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .hw-footnote {
+        font-style: italic;
+        font-size: 12px;
+        color: #666;
+        margin-top: 15px;
+        line-height: 1.5;
+    }
+    #hw_submitBtn:disabled {
+        background: #9e9e9e;
+        cursor: not-allowed;
+        transform: none;
+    }
+    .hw-status-message {
+        display: none;
+        text-align: center;
+        margin-top: 15px;
+        padding: 12px;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 14px;
+    }
+    .hw-status-message.success { display: block; background: #e8f5e9; color: #2e7d32; }
+    .hw-status-message.error   { display: block; background: #ffebee; color: #c62828; }
+</style>
 
+<script>
+(function () {
+    'use strict';
 
+    // ============================================================
+    // CONFIG — replace with the Hot Work Permit Rewst webhook URL
+    // ============================================================
+    var HW_REWST_WEBHOOK_URL = 'https://engine.rewst.io/webhooks/custom/trigger/YOUR_ORG_ID/YOUR_TRIGGER_ID';
+
+    // ------------------------------------------------------------
+    // Navigation: wrap the ORIGINAL showForm without modifying it.
+    // Existing buttons keep calling showForm('vehicle'/'flha');
+    // the wrapper just also hides the hot work form first.
+    // ------------------------------------------------------------
+    var origShowForm = window.showForm;
+    window.showForm = function (formType) {
+        document.getElementById('hotworkForm').classList.remove('active');
+        document.getElementById('hotworkBtn').classList.remove('active');
+        origShowForm(formType);
+    };
+
+    window.showHotWorkForm = function () {
+        document.getElementById('flhaForm').classList.remove('active');
+        document.getElementById('vehicleForm').classList.remove('active');
+        document.getElementById('flhaBtn').classList.remove('active');
+        document.getElementById('vehicleBtn').classList.remove('active');
+        document.getElementById('hotworkForm').classList.add('active');
+        document.getElementById('hotworkBtn').classList.add('active');
+    };
+
+    // 19 checklist items — [fieldName, label]. Field names become
+    // "checklist_<fieldName>" keys in the JSON payload (xlsx columns).
+    var checklistItems = [
+        ['trainedInSafeOperation',    'Person doing hot work has been trained in safe operation of equipment, and how to work safely'],
+        ['ppeAvailable',              'Appropriate PPE (eye protection, helmet, protective clothing, respirator, gloves, etc.) available'],
+        ['weldingBoothScreens',       'Where work permits, welding booth screens will be used'],
+        ['fireExtinguishersPlaced',   'Fire extinguishers placed for immediate use'],
+        ['floorsSwept35ft',           'Floors swept clean of combustible materials for a radius of 35 feet'],
+        ['combustibleFloorsProtected','Combustible floors dampened, covered with damp sand, or protected with fire-resistant shields'],
+        ['combustiblesMoved35ft',     'Combustible materials and supplies moved at least 35 feet away from hot work location'],
+        ['openingsCovered',           'Wall and floor openings (windows, etc) within 35 feet of work location have been covered'],
+        ['noFlammableVapors',         'Equipment not to be used near flammable vapors or liquids, or containers that have contained flammable vapors or liquids'],
+        ['fireHazardsGuarded',        'Fire hazards that can\u2019t be moved protected by appropriate guards'],
+        ['ductworkProtected',         'Dusts and conveyor systems such as duct work that might carry sparks cleaned, protected and shut down where necessary'],
+        ['pipeLinesDisconnected',     'Any pipe lines to containers disconnected or blanked'],
+        ['equipmentGoodCondition',    'Equipment to be used is in good condition'],
+        ['containerCleanedVentilated','If welding a container, container has been thoroughly cleaned and ventilated'],
+        ['contractorsAdvised',        'On-site contractors advised of hot work'],
+        ['warningSignsPosted',        'Warning sign(s) posted to warn other workers'],
+        ['confinedSpacePermit',       'If working in confined space, confined space permit has been issued'],
+        ['inspectAreaAfterWork',      'Inspect work area after work is done to ensure it is safe'],
+        ['fireWatch30Min',            'Maintain a fire watch during operations and for 30 minutes after work has been completed']
+    ];
+
+    function generateHwRow(fieldName, label) {
+        var name = 'checklist_' + fieldName;
+        return '<tr><td>' + label + '</td>' +
+               '<td><input type="radio" name="' + name + '" value="yes" required></td>' +
+               '<td><input type="radio" name="' + name + '" value="no"></td></tr>';
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Populate hot work checklist table (one time)
+        var tbody = document.getElementById('hw_checklistTableBody');
+        tbody.innerHTML = '';
+        checklistItems.forEach(function (item) {
+            tbody.innerHTML += generateHwRow(item[0], item[1]);
+        });
+
+        // Default both date fields to today
+        var today = new Date().toISOString().split('T')[0];
+        document.getElementById('hw_permitDate').value = today;
+        document.getElementById('hw_signatureDate').value = today;
+
+        // Mark-all — scoped to hot work buttons/table ONLY.
+        // (The pre-existing global .mark-all-btn listener also fires on these
+        // clicks, but it targets #inspectionTableBody with vehicle status
+        // values, so it matches nothing here. Harmless by design.)
+        document.querySelectorAll('#hotworkForm .hw-mark-all').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var status = this.dataset.status;
+                document
+                    .querySelectorAll('#hw_checklistTableBody input[type="radio"][value="' + status + '"]')
+                    .forEach(function (r) { r.checked = true; });
+            });
+        });
+
+        // Submit as JSON to the hot work Rewst webhook.
+        // preventDefault stops native POST; the pre-existing global submit
+        // listener still runs but early-returns for non-FLHA formType.
+        document.getElementById('hw_form').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            var formEl = this;
+            var submitBtn = document.getElementById('hw_submitBtn');
+            var statusMessage = document.getElementById('hw_statusMessage');
+            statusMessage.className = 'hw-status-message';
+
+            var payload = { submittedAt: new Date().toISOString() };
+            new FormData(formEl).forEach(function (value, key) { payload[key] = value; });
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            fetch(HW_REWST_WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(function (response) {
+                if (!response.ok) throw new Error('Webhook returned ' + response.status);
+                statusMessage.textContent = 'Hot Work Permit submitted successfully.';
+                statusMessage.classList.add('success');
+                formEl.reset();
+                document.getElementById('hw_permitDate').value = today;
+                document.getElementById('hw_signatureDate').value = today;
+            })
+            .catch(function (err) {
+                console.error('Hot Work Permit submission failed:', err);
+                statusMessage.textContent = 'Submission failed. Check your connection and try again.';
+                statusMessage.classList.add('error');
+            })
+            .then(function () {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Hot Work Permit';
+            });
+        });
+    });
+})();
+</script>
 </body></html>
