@@ -376,6 +376,9 @@
     <button onclick="showHotWorkForm()" id="hotworkBtn" class="">
         Hot Work Permit
     </button>
+    <button onclick="showWedgeForm()" id="wedgeBtn" class="">
+        Wedge Set Procedures
+    </button>
 </div>
 
 
@@ -810,6 +813,78 @@
             </form>
         </div>
 
+        <!-- ============================================================ -->
+        <!-- Wedge Set Procedures Form (ADDITIVE - do not modify the      -->
+        <!-- FLHA / Vehicle / Hot Work forms). All IDs prefixed ws_ to    -->
+        <!-- avoid collisions. Safe to delete this block plus the ws_     -->
+        <!-- style/script block at the bottom to fully roll back.         -->
+        <!-- ============================================================ -->
+        <div id="wedgeForm" class="form-container">
+            <h1>Wedge Set Procedures</h1>
+
+            <form id="ws_form" method="POST">
+                <input type="hidden" name="formType" value="WedgeSetProcedures">
+                <input type="hidden" name="submittedAt" id="ws_submittedAt" value="">
+
+                <div class="section">
+                    <div class="section-title">Job Information</div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="ws_setDate">Date:</label>
+                            <input type="date" name="setDate" id="ws_setDate" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="ws_jobNumber">Job Number:</label>
+                            <input type="text" name="jobNumber" id="ws_jobNumber">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Procedures</div>
+
+                    <div class="mark-all-group">
+                        <span class="mark-all-label">Apply to all:</span>
+                        <input type="text" id="ws_crewAllInitials" class="ws-apply-input" maxlength="5" autocomplete="off" placeholder="Crew" aria-label="Crew initials to apply to all rows">
+                        <button type="button" class="mark-all-btn ws-apply-all" data-target="crew">Fill Crew Int.</button>
+                        <input type="text" id="ws_superAllInitials" class="ws-apply-input" maxlength="5" autocomplete="off" placeholder="Super" aria-label="Supervisor initials to apply to all rows">
+                        <button type="button" class="mark-all-btn ws-apply-all" data-target="super">Fill Super Int.</button>
+                    </div>
+
+                    <!-- NOTE: intentionally NOT using .inspection-table (sticky column CSS is scoped to it) -->
+                    <div class="ws-procedures-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Procedure</th>
+                                    <th style="width:90px;">Crew Int.</th>
+                                    <th style="width:90px;">Super Int.</th>
+                                </tr>
+                            </thead>
+                            <!-- IMPORTANT: leave empty; JS generates rows to avoid duplicates -->
+                            <tbody id="ws_proceduresTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Sign-Off</div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="ws_leadShiftSignature">Lead Shift Signature (type full name):</label>
+                            <input type="text" name="leadShiftSignature" id="ws_leadShiftSignature" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="ws_supervisorSignature">Supervisor Signature (type full name):</label>
+                            <input type="text" name="supervisorSignature" id="ws_supervisorSignature" required>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="ws_submitBtn">Submit Wedge Set Procedures</button>
+            </form>
+        </div>
+
         <div id="hudu-eh-root"></div>
         <div id="hudu-ch-root"></div>
         <div id="hudu-pc-root"></div>
@@ -1070,6 +1145,171 @@ showForm('vehicle'); // force Vehicle Inspection as default
             // a disabled button is excluded from form data anyway (it has
             // no name attribute, so nothing is lost either way).
             var submitBtn = document.getElementById('hw_submitBtn');
+            setTimeout(function () {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Submitting...';
+            }, 0);
+        });
+    });
+})();
+</script>
+
+
+<!-- ================================================================ -->
+<!-- WEDGE SET PROCEDURES - additive styles + logic. No existing code -->
+<!-- above this comment has been modified. Safe to remove this block  -->
+<!-- (and the #wedgeForm markup + nav button) to fully roll back.     -->
+<!-- ================================================================ -->
+<style>
+    .ws-procedures-table { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+    /* Procedure text column reads as a left-hand list, matching the paper form */
+    .ws-procedures-table td:first-child { line-height: 1.4; }
+
+    .ws-init {
+        width: 100%;
+        max-width: 70px;
+        padding: 8px 4px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+        text-align: center;
+    }
+
+    .ws-apply-input {
+        width: 80px;
+        padding: 6px 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 13px;
+        text-align: center;
+    }
+
+    #ws_submitBtn:disabled {
+        background: #9e9e9e;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    @media (max-width: 600px) {
+        .ws-init { max-width: 60px; padding: 8px 2px; }
+        .ws-apply-input { width: 70px; }
+    }
+</style>
+
+<script>
+(function () {
+    'use strict';
+
+    // ============================================================
+    // CONFIG - Wedge Set Procedures Rewst webhook URL.
+    // Currently points at the shared FLHA/Vehicle trigger; routing
+    // downstream is by formType ("WedgeSetProcedures"). Swap this
+    // for a dedicated trigger URL if you stand one up.
+    // ============================================================
+    var WS_REWST_WEBHOOK_URL = 'https://engine.rewst.io/webhooks/custom/trigger/019fb89d-3ce6-79df-9e6b-22410daa1d64/f351c554-9f0a-4490-b615-3d7f26c999d7';
+
+    // ------------------------------------------------------------
+    // Navigation: wrap the EXISTING showForm / showHotWorkForm
+    // without modifying them. Existing buttons keep working; the
+    // wrappers just also hide the wedge form first.
+    // ------------------------------------------------------------
+    function hideWedge() {
+        document.getElementById('wedgeForm').classList.remove('active');
+        document.getElementById('wedgeBtn').classList.remove('active');
+    }
+
+    var prevShowForm = window.showForm;
+    window.showForm = function (formType) {
+        hideWedge();
+        prevShowForm(formType);
+    };
+
+    var prevShowHotWorkForm = window.showHotWorkForm;
+    window.showHotWorkForm = function () {
+        hideWedge();
+        prevShowHotWorkForm();
+    };
+
+    window.showWedgeForm = function () {
+        ['flhaForm', 'vehicleForm', 'hotworkForm',
+         'flhaBtn', 'vehicleBtn', 'hotworkBtn'].forEach(function (id) {
+            document.getElementById(id).classList.remove('active');
+        });
+        document.getElementById('wedgeForm').classList.add('active');
+        document.getElementById('wedgeBtn').classList.add('active');
+    };
+
+    // 13 procedure steps - [fieldName, label], in paper-form order.
+    // Field names become "crew_<fieldName>" / "super_<fieldName>"
+    // keys in the payload (xlsx columns).
+    var procedures = [
+        ['assembleWedgeOnSite',        'Assemble wedge on site'],
+        ['dropperBarSubGlued',         'Make sure dropper bar orientation sub is glued on'],
+        ['waterWayWeldedShut',         'Make sure water way is welded shut'],
+        ['boltDropperBarWeldNails',    'Bolt dropper bar to wedge / weld nails'],
+        ['rollTestCameraPosted',       'Roll test of camera / post roll test on WhatsApp'],
+        ['singleShotPicturePosted',    'Insert single shot / take picture / post to WhatsApp'],
+        ['orientationPinPicturePosted','Take picture of smashed orientation pin / post to WhatsApp'],
+        ['hoistWedgeRemoveBoltTripIn', 'Hoist wedge with 4X4 then remove bolt / 4X4 / trip in'],
+        ['seniorDscCrewOnSite',        'Senior member of DSC Crew will be on site for set'],
+        ['shotsPostedToGeology',       'Post roll test, pre and post orientation shot, to geology on WhatsApp'],
+        ['stopTenFeetAboveWoodPlug',   'Stop minimum of 10\u2019 above wood plug / orient wedge'],
+        ['fineFeedContactWoodPlug',    'Bring wedge down with fine feed to see when it makes contact w/ wood plug'],
+        ['videoDrillerSetsWedge',      'Start a video / have driller set wedge w/ fast feed / post to WhatsApp']
+    ];
+
+    function generateWsRow(fieldName, label) {
+        return '<tr><td>' + label + '</td>' +
+               '<td><input type="text" class="ws-init" name="crew_' + fieldName +
+                   '" maxlength="5" autocomplete="off" aria-label="Crew initials"></td>' +
+               '<td><input type="text" class="ws-init" name="super_' + fieldName +
+                   '" maxlength="5" autocomplete="off" aria-label="Supervisor initials"></td></tr>';
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Populate procedures table (one time)
+        var tbody = document.getElementById('ws_proceduresTableBody');
+        tbody.innerHTML = '';
+        procedures.forEach(function (item) {
+            tbody.innerHTML += generateWsRow(item[0], item[1]);
+        });
+
+        // Default date to today
+        document.getElementById('ws_setDate').value = new Date().toISOString().split('T')[0];
+
+        // Fill-a-whole-column convenience - scoped to wedge buttons/table ONLY.
+        // (The pre-existing global .mark-all-btn listener also fires on these
+        // clicks, but it reads data-status - absent here - and targets
+        // #inspectionTableBody radios, so it matches nothing. Harmless by design.)
+        document.querySelectorAll('#wedgeForm .ws-apply-all').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var target = this.dataset.target;
+                var src = document.getElementById(
+                    target === 'crew' ? 'ws_crewAllInitials' : 'ws_superAllInitials'
+                );
+                var value = src.value.trim();
+                if (!value) { src.focus(); return; }
+                document
+                    .querySelectorAll('#ws_proceduresTableBody input[name^="' + target + '_"]')
+                    .forEach(function (input) { input.value = value; });
+            });
+        });
+
+        // Native POST submission (same pattern as the Hot Work / FLHA / Vehicle
+        // forms). A fetch() with Content-Type: application/json is blocked by
+        // CORS preflight on Rewst's webhook endpoint; native form navigation is
+        // exempt. Rewst parses the form-encoded body into the same CTX.body
+        // structure, so nothing downstream changes.
+        var wsForm = document.getElementById('ws_form');
+        wsForm.action = WS_REWST_WEBHOOK_URL;
+
+        // The pre-existing global submit listener also fires here but
+        // early-returns for non-FLHA formType. Harmless by design.
+        wsForm.addEventListener('submit', function () {
+            document.getElementById('ws_submittedAt').value = new Date().toISOString();
+
+            var submitBtn = document.getElementById('ws_submitBtn');
             setTimeout(function () {
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Submitting...';
